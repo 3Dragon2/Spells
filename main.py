@@ -11,14 +11,14 @@ def load_data():
 
     # Define school multipliers (can be customized later)
     school_multipliers = {
-        "abjuration": 1.1,
-        "conjuration": 1.1,
-        "divination": 1.1,
-        "enchantment": 1.1,
-        "evocation": 1.1,
-        "illusion": 1.1,
+        "abjuration": 1.0,
+        "conjuration": 1.3,
+        "divination": 1.0,
+        "enchantment": 1.0,
+        "evocation": 1.4,
+        "illusion": 0.9,
         "necromancy": 1.1,
-        "transmutation": 1.1
+        "transmutation": 1.2
     }
 
     for item in data:
