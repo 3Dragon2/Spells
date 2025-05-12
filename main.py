@@ -8,14 +8,36 @@ def load_data():
     with open('spells.json') as file:
         data = json.load(file)
 
-    # Add mana cost based on level
+    # Define school multipliers (can be customized later)
+    school_multipliers = {
+        "abjuration": 1.1,
+        "conjuration": 1.1,
+        "divination": 1.1,
+        "enchantment": 1.1,
+        "evocation": 1.1,
+        "illusion": 1.1,
+        "necromancy": 1.1,
+        "transmutation": 1.1
+    }
+
     for item in data:
-        if "level" in item:
-            try:
-                level = int(item["level"])
-                item["mana cost"] = (level + 1) * 15
-            except:
-                item["mana cost"] = 0
+        # Normalize range to integer (in feet where possible)
+        raw_range = item.get("range", "")
+        match = re.search(r'(\d+)', raw_range)
+        range_ft = int(match.group(1)) if match else 0
+        item["range_numeric"] = range_ft
+
+        try:
+            level = int(item.get("level", 0))
+        except:
+            level = 0
+
+        school = item.get("school", "").lower()
+        multiplier = school_multipliers.get(school, 1.0)
+
+        # New mana cost formula
+        base = round(range_ft / 60) + pow(2, level)
+        item["mana cost"] = round(base * multiplier)
 
     df = pd.json_normalize(data, sep='_')
 
@@ -25,7 +47,8 @@ def load_data():
         'components_somatic': 'Somatic',
         'components_material': 'Material',
         'components_materials_needed': 'Materials Needed',
-        'components_raw': 'Components (Raw)'
+        'components_raw': 'Components (Raw)',
+        'range_numeric': 'Range (ft)'
     }, inplace=True)
 
     # Convert bools to emojis
@@ -34,11 +57,12 @@ def load_data():
             df[col] = df[col].apply(lambda x: '✅' if x else '❌')
 
     # Reorder columns
-    preferred_order = ['name', 'level', 'mana cost', 'range', 'duration', 'casting_time']
+    preferred_order = ['name', 'level', 'mana cost', 'Range (ft)', 'range', 'duration', 'casting_time']
     remaining_cols = [col for col in df.columns if col not in preferred_order]
     df = df[preferred_order + remaining_cols]
 
     return df
+
 
 df = load_data()
 
