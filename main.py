@@ -38,8 +38,8 @@ def load_data():
         multiplier = school_multipliers.get(school, 1.0)
 
         # New mana cost formula
-        base = round(range_ft / 60) + pow(2, level)
-        #base = round(m.log2(range_ft + 1)) + pow(2, level)
+        #base = round(range_ft / 60) + pow(2, level)
+        base = round(level * m.log2(range_ft + 1)) + pow(2, level)
         item["mana cost"] = round(base * multiplier)
 
     df = pd.json_normalize(data, sep='_')
@@ -95,22 +95,41 @@ view_mode = st.radio("View Mode", ['Table', 'Cards'])
 
 st.title("🧙 Spellbook Viewer")
 
+# Conditional color for mana cost
+def color_mana(val):
+    if val < 10:
+        return 'background-color: #add8e6' #light blue
+    elif val < 20:
+        return 'background-color: #90EE90'  # light green
+    elif val < 40:
+        return 'background-color: #FFFFED'  # light yellow
+    elif val < 80:
+        return 'background-color: #FFD580'  # light orange
+    else:
+        return 'background-color: #FF474C'  # light red
+
 if view_mode == 'Table':
-    st.dataframe(filtered_df, use_container_width=True)
+    styled_df = filtered_df.style.applymap(color_mana, subset=['mana cost'])
+    st.dataframe(styled_df, use_container_width=True, height=600)
 else:
     for _, row in filtered_df.iterrows():
         with st.expander(f"{row['name']} ({row['level']} lvl - {row['school']})"):
             st.markdown(f"""
             **Casting Time**: {row['casting_time']}  
-            **Range**: {row['range']}  
+            **Range**: {row['range']} ({row['Range (ft)']} ft)  
             **Ritual**: {'✅' if row['ritual'] else '❌'}  
-            **Mana Cost**: {row['mana cost']}  
+            **Mana Cost**: <span style='background-color:#eef;text-align:center;padding:0.2em 0.4em;border-radius:0.25rem'>{row['mana cost']}</span>  
             **Components**: {row['Components (Raw)']}  
             **Verbal**: {row['Verbal']}  
             **Somatic**: {row['Somatic']}  
             **Material**: {row['Material']}  
             **Materials Needed**: {row['Materials Needed'] or 'None'}  
-            
-            **Description**: {row['description']}  
+
+            <details>
+            <summary><strong>Description</strong></summary>
+            <p style='white-space: pre-wrap'>{row['description']}</p>
+            </details>
+
             **Higher Levels**: {row['higher_levels'] or 'None'}
-            """)
+            """, unsafe_allow_html=True)
+
