@@ -37,7 +37,8 @@ def load_data():
         multiplier = school_multipliers.get(school, 1.0)
 
         # New mana cost formula
-        base = round(range_ft / 60) + pow(2, level)
+        #base = round(range_ft / 60) + pow(2, level)
+        base = round(log2(range_ft + 1)) + pow(2, level)
         item["mana cost"] = round(base * multiplier)
 
     df = pd.json_normalize(data, sep='_')
