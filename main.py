@@ -98,15 +98,15 @@ st.title("🧙 Spellbook Viewer")
 # Conditional color for mana cost
 def color_mana(val):
     if val < 10:
-        return 'background-color: #add8e6' #light blue
+        return 'background-color: #add8e6; color: black'  # light blue + black text
     elif val < 20:
-        return 'background-color: #90EE90'  # light green
+        return 'background-color: #90EE90; color: black'  # light green + black text
     elif val < 40:
-        return 'background-color: #FFFFED'  # light yellow
+        return 'background-color: #FFFFED; color: black'  # light yellow + black text
     elif val < 80:
-        return 'background-color: #FFD580'  # light orange
+        return 'background-color: #FFD580; color: black'  # light orange + black text
     else:
-        return 'background-color: #FF474C'  # light red
+        return 'background-color: #FF474C; color: white'  # strong red + white text
 
 if view_mode == 'Table':
     styled_df = filtered_df.style.applymap(color_mana, subset=['mana cost'])
