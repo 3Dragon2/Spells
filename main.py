@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import math as m
 import re
 import json
 
@@ -38,7 +39,7 @@ def load_data():
 
         # New mana cost formula
         #base = round(range_ft / 60) + pow(2, level)
-        base = round(log2(range_ft + 1)) + pow(2, level)
+        base = round(m.log2(range_ft + 1)) + pow(2, level)
         item["mana cost"] = round(base * multiplier)
 
     df = pd.json_normalize(data, sep='_')
